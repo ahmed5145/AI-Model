@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boston House Price Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const formProps = Object.fromEntries(formData);
+            
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: new URLSearchParams(formProps)
+            });
+            
+            const result = await response.json();
+            alert(`Linear Regression Model Predicted Price: $${result.prediction_lr.toFixed(2)}\nRandom Forest Model Predicted Price: $${result.prediction_rf.toFixed(2)}\nAverage Predicted Price: $${result.prediction_avg.toFixed(2)}`);
+        }
+
+        async function handleFileUpload(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            if (result.error) {
+                alert(result.error);
+            } else {
+                alert(`Linear Regression Predictions: \n${result.linear_regression.join('\n')}\n\nRandom Forest Predictions: \n${result.random_forest.join('\n')}\n\nAverage Predictions: \n${result.average_prediction.join('\n')}`);
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Boston House Price Prediction</h1>
+    <form onsubmit="handleFormSubmit(event)">
+        <label for="CRIM">CRIM:</label>
+        <input type="text" name="CRIM" required><br>
+        
+        <label for="ZN">ZN:</label>
+        <input type="text" name="ZN" required><br>
+        
+        <label for="INDUS">INDUS:</label>
+        <input type="text" name="INDUS" required><br>
+        
+        <label for="CHAS">CHAS:</label>
+        <input type="text" name="CHAS" required><br>
+        
+        <label for="NOX">NOX:</label>
+        <input type="text" name="NOX" required><br>
+        
+        <label for="RM">RM:</label>
+        <input type="text" name="RM" required><br>
+        
+        <label for="AGE">AGE:</label>
+        <input type="text" name="AGE" required><br>
+        
+        <label for="DIS">DIS:</label>
+        <input type="text" name="DIS" required><br>
+        
+        <label for="RAD">RAD:</label>
+        <input type="text" name="RAD" required><br>
+        
+        <label for="TAX">TAX:</label>
+        <input type="text" name="TAX" required><br>
+        
+        <label for="PTRATIO">PTRATIO:</label>
+        <input type="text" name="PTRATIO" required><br>
+        
+        <label for="B">B:</label>
+        <input type="text" name="B" required><br>
+        
+        <label for="LSTAT">LSTAT:</label>
+        <input type="text" name="LSTAT" required><br>
+        
+        <button type="submit">Predict</button>
+    </form>
+
+    <h2>Upload CSV for Batch Predictions</h2>
+    <form onsubmit="handleFileUpload(event)" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv" required>
+        <button type="submit">Upload and Predict</button>
+    </form>
+</body>
+</html>
