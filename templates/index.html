@@ -36,6 +36,15 @@
                 alert(`Linear Regression Predictions: \n${result.linear_regression.join('\n')}\n\nRandom Forest Predictions: \n${result.random_forest.join('\n')}\n\nAverage Predictions: \n${result.average_prediction.join('\n')}`);
             }
         }
+
+        async function fetchAccuracy() {
+            const response = await fetch('/accuracy', {
+                method: 'GET'
+            });
+            
+            const result = await response.json();
+            alert(`Model Accuracy:\n\nLinear Regression Accuracy: ${result['Linear Regression Accuracy']}\nRandom Forest Accuracy: ${result['Random Forest Accuracy']}`);
+        }
     </script>
 </head>
 <body>
@@ -88,5 +97,8 @@
         <input type="file" name="file" accept=".csv" required>
         <button type="submit">Upload and Predict</button>
     </form>
+
+    <h2>Model Accuracy</h2>
+    <button onclick="fetchAccuracy()">Fetch Accuracy</button>
 </body>
 </html>

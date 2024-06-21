@@ -51,52 +51,35 @@ train_test_split(variables, price, test_size=0.2, random_state=100)
 lr = LinearRegression()
 lr.fit(variables_train, price_train)
 
-### Applying the model to make a prediction
-
-price_lr_train_pred = lr.predict(variables_train)
-price_lr_test_pred = lr.predict(variables_test)
-
-### Evaluate Model Performance
-lr_train_mse = mean_squared_error(price_train, price_lr_train_pred)
-lr_train_r2 = r2_score(price_train, price_lr_train_pred)
-
-lr_test_mse = mean_squared_error(price_test, price_lr_test_pred)
-lr_test_r2 = r2_score(price_test, price_lr_test_pred)
-
-lr_results = pd.DataFrame(['Linear Regression', lr_train_mse, lr_train_r2, lr_test_mse, lr_test_r2]).transpose()
-lr_results.columns = ['Method', 'Training MSE', 'Training R2', 'Test MSE', 'Test R2']
 
 ## Random Forest
 ### Training the model
 rf = RandomForestRegressor(max_depth=2, random_state=100)
 rf.fit(variables_train, price_train)
 
-### Applying the model to make predictions
-price_rf_train_pred = rf.predict(variables_train)
-price_rf_test_pred = rf.predict(variables_test)
-
-### Evaluate Model Performance
-rf_train_mse = mean_squared_error(price_train, price_rf_train_pred)
-rf_train_r2 = r2_score(price_train, price_rf_train_pred)
-
-rf_test_mse = mean_squared_error(price_test, price_rf_test_pred)
-rf_test_r2 = r2_score(price_test, price_rf_test_pred)
-
-rf_results = pd.DataFrame(['Random Forest', rf_train_mse, rf_train_r2, rf_test_mse, rf_test_r2]).transpose()
-rf_results.columns = ['Method', 'Training MSE', 'Training R2', 'Test MSE', 'Test R2']
-
-
-## Model Comparison
-df_models = pd.concat([lr_results, rf_results], axis=0).reset_index(drop=True)
-
-
-
+# Function to make predictions
 def predict_price(features):
     input_data = pd.DataFrame([features], columns=variables.columns)
     prediction_lr = lr.predict(input_data)[0]
     prediction_rf = rf.predict(input_data)[0]
     prediction_avg = (prediction_lr + prediction_rf) / 2
     return prediction_lr, prediction_rf, prediction_avg
+
+# Function to calculate accuracy score
+def calculate_accuracy():
+    # Predicting on the test set
+    price_lr_test_pred = lr.predict(variables_test)
+    price_rf_test_pred = rf.predict(variables_test)
+
+    # Calculating R2 Score
+    lr_r2_score = r2_score(price_test, price_lr_test_pred)
+    rf_r2_score = r2_score(price_test, price_rf_test_pred)
+
+    # Converting R2 Score to percentage
+    lr_accuracy = lr_r2_score * 100
+    rf_accuracy = rf_r2_score * 100
+
+    return lr_accuracy, rf_accuracy
 
 @app.route('/')
 def home():
@@ -141,6 +124,14 @@ def upload_file():
             'random_forest': predictions_rf,
             'average_prediction': predictions_avg
         })
+
+@app.route('/accuracy', methods=['GET'])
+def accuracy():
+    lr_accuracy, rf_accuracy = calculate_accuracy()
+    return jsonify({
+        'Linear Regression Accuracy': f'{lr_accuracy:.2f}%',
+        'Random Forest Accuracy': f'{rf_accuracy:.2f}%'
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)
