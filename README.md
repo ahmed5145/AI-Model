@@ -37,13 +37,13 @@ This repository contains a Flask-based web application for predicting Boston hou
 ```bash
 git clone https://github.com/ahmed5145/ML-Model-Housing-Prices-in-Boston.git
 cd ML-Model-Housing-Prices-in-Boston
-
+```
 2. Create and activate a virtual environment:
 python -m venv venv
 source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
 
 3. Install the required packages:
-pip install -r requirements.txt
+`pip install -r requirements.txt`
 
 Open a web browser and navigate to http://127.0.0.1:5000/
 
